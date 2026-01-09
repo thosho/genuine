@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     displayProducts();
     updateCartUI();
     setupEventListeners();
+    setupSmoothScroll();
 });
 
 // Setup Event Listeners
@@ -146,6 +147,33 @@ function setupEventListeners() {
     document.getElementById('checkoutForm').addEventListener('submit', handleCheckout);
 }
 
+// Setup Smooth Scroll
+function setupSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+}
+
+// Mobile Menu Toggle
+function toggleMobileMenu() {
+    const navMenu = document.getElementById('navMenu');
+    navMenu.classList.toggle('active');
+}
+
+function closeMobileMenu() {
+    const navMenu = document.getElementById('navMenu');
+    navMenu.classList.remove('active');
+}
+
 // Display Products
 function displayProducts(searchTerm = '') {
     const grid = document.getElementById('productsGrid');
@@ -166,7 +194,7 @@ function displayProducts(searchTerm = '') {
 
     grid.innerHTML = filteredProducts.map(product => `
         <div class="product-card" onclick="showProductDetails(${product.id})">
-            <img src="${product.image}" alt="${product.name}" class="product-image">
+            <img src="${product.image}" alt="${product.name}" class="product-image" loading="lazy">
             <div class="product-info">
                 <span class="product-category">${product.category}</span>
                 <h3 class="product-name">${product.name}</h3>
@@ -175,13 +203,13 @@ function displayProducts(searchTerm = '') {
                     ${product.features.slice(0, 3).map(f => `<li><i class="fas fa-check"></i> ${f}</li>`).join('')}
                 </ul>
                 <div class="product-pricing">
-                    <span class="product-price">₹${product.price.toLocaleString()}</span>
-                    <span class="product-original-price">₹${product.originalPrice.toLocaleString()}</span>
+                    <span class="product-price">₹${product.price.toLocaleString('en-IN')}</span>
+                    <span class="product-original-price">₹${product.originalPrice.toLocaleString('en-IN')}</span>
                 </div>
                 <span class="product-discount">${Math.round((1 - product.price/product.originalPrice) * 100)}% OFF</span>
                 <div class="product-actions">
                     <button class="btn btn-primary" onclick="event.stopPropagation(); addToCart(${product.id})">
-                        <i class="fas fa-cart-plus"></i> Add to Cart
+                        <i class="fas fa-cart-plus"></i> Add
                     </button>
                     <button class="btn btn-secondary" onclick="event.stopPropagation(); askQuestion(${product.id})">
                         <i class="fas fa-question-circle"></i> Ask
@@ -205,12 +233,12 @@ function showProductDetails(productId) {
             </div>
             <div>
                 <span class="product-category">${product.category}</span>
-                <h2>${product.name}</h2>
+                <h2 style="margin: 0.5rem 0;">${product.name}</h2>
                 <span class="product-condition">${product.condition} Condition</span>
-                <p style="margin: 1rem 0; color: var(--text-light);">${product.description}</p>
+                <p style="margin: 1rem 0; color: var(--text-light); line-height: 1.6;">${product.description}</p>
                 
                 <div style="margin: 1.5rem 0;">
-                    <h4>Specifications:</h4>
+                    <h4 style="margin-bottom: 0.75rem;">Specifications:</h4>
                     <ul class="product-features">
                         ${product.features.map(f => `<li><i class="fas fa-check"></i> ${f}</li>`).join('')}
                         <li><i class="fas fa-check"></i> RAM: ${product.ram}</li>
@@ -219,12 +247,12 @@ function showProductDetails(productId) {
                 </div>
                 
                 <div class="product-pricing" style="margin: 1.5rem 0;">
-                    <span class="product-price">₹${product.price.toLocaleString()}</span>
-                    <span class="product-original-price">₹${product.originalPrice.toLocaleString()}</span>
+                    <span class="product-price">₹${product.price.toLocaleString('en-IN')}</span>
+                    <span class="product-original-price">₹${product.originalPrice.toLocaleString('en-IN')}</span>
                 </div>
                 <span class="product-discount">${Math.round((1 - product.price/product.originalPrice) * 100)}% OFF</span>
                 
-                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="addToCart(${product.id}); closeProductModal();">
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.85rem;" onclick="addToCart(${product.id}); closeProductModal();">
                     <i class="fas fa-cart-plus"></i> Add to Cart
                 </button>
             </div>
@@ -232,12 +260,12 @@ function showProductDetails(productId) {
     `;
 
     document.getElementById('productModal').classList.add('active');
-    document.getElementById('overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
 
 function closeProductModal() {
     document.getElementById('productModal').classList.remove('active');
-    document.getElementById('overlay').classList.remove('active');
+    document.body.style.overflow = 'auto';
 }
 
 // Cart Functions
@@ -256,7 +284,7 @@ function addToCart(productId) {
     updateCartUI();
     
     // Show notification
-    alert(`${product.name} added to cart!`);
+    showNotification(`${product.name} added to cart!`);
 }
 
 function removeFromCart(productId) {
@@ -290,7 +318,7 @@ function updateCartUI() {
             <img src="${item.image}" alt="${item.name}" class="cart-item-image">
             <div class="cart-item-info">
                 <div class="cart-item-name">${item.name}</div>
-                <div class="cart-item-price">₹${item.price.toLocaleString()}</div>
+                <div class="cart-item-price">₹${item.price.toLocaleString('en-IN')}</div>
             </div>
             <button class="cart-item-remove" onclick="removeFromCart(${item.id})">
                 <i class="fas fa-trash"></i>
@@ -298,14 +326,17 @@ function updateCartUI() {
         </div>
     `).join('');
 
-    cartTotal.textContent = `₹${total.toLocaleString()}`;
+    cartTotal.textContent = `₹${total.toLocaleString('en-IN')}`;
 }
 
 function toggleCart() {
     const sidebar = document.getElementById('cartSidebar');
-    const overlay = document.getElementById('overlay');
     sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
+    if (sidebar.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = 'auto';
+    }
 }
 
 // Checkout Functions
@@ -316,17 +347,17 @@ function proceedToCheckout() {
     }
 
     const total = cart.reduce((sum, item) => sum + item.price, 0);
-    document.getElementById('checkoutSubtotal').textContent = `₹${total.toLocaleString()}`;
-    document.getElementById('checkoutTotal').textContent = `₹${total.toLocaleString()}`;
+    document.getElementById('checkoutSubtotal').textContent = `₹${total.toLocaleString('en-IN')}`;
+    document.getElementById('checkoutTotal').textContent = `₹${total.toLocaleString('en-IN')}`;
 
     toggleCart();
     document.getElementById('checkoutModal').classList.add('active');
-    document.getElementById('overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
 
 function closeCheckoutModal() {
     document.getElementById('checkoutModal').classList.remove('active');
-    document.getElementById('overlay').classList.remove('active');
+    document.body.style.overflow = 'auto';
 }
 
 async function handleCheckout(e) {
@@ -345,24 +376,7 @@ async function handleCheckout(e) {
     };
 
     // Simulate payment processing
-    const processingMsg = document.createElement('div');
-    processingMsg.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        z-index: 4000;
-        text-align: center;
-    `;
-    processingMsg.innerHTML = `
-        <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary-color);"></i>
-        <p style="margin-top: 1rem;">Processing your payment...</p>
-    `;
-    document.body.appendChild(processingMsg);
+    showProcessingOverlay();
 
     // Simulate payment delay
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -387,14 +401,75 @@ async function handleCheckout(e) {
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartUI();
 
-    // Remove processing message
-    document.body.removeChild(processingMsg);
+    // Hide processing overlay
+    hideProcessingOverlay();
 
     // Close modal
     closeCheckoutModal();
 
     // Show success message
-    alert(`Order placed successfully! Order ID: ${order.orderId}\n\nYour invoice has been downloaded.`);
+    alert(`✅ Order placed successfully!\n\nOrder ID: ${order.orderId}\n\nYour invoice has been downloaded.\n\nThank you for shopping with Genuine Devices!`);
+}
+
+// Processing Overlay
+function showProcessingOverlay() {
+    const overlay = document.createElement('div');
+    overlay.id = 'processingOverlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 5000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
+    overlay.innerHTML = `
+        <div style="background: white; padding: 2.5rem; border-radius: 12px; text-align: center; max-width: 90%;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary-color);"></i>
+            <p style="margin-top: 1rem; font-size: 1.1rem; font-weight: 600;">Processing your payment...</p>
+            <p style="margin-top: 0.5rem; color: var(--text-light);">Please wait</p>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+}
+
+function hideProcessingOverlay() {
+    const overlay = document.getElementById('processingOverlay');
+    if (overlay) {
+        document.body.removeChild(overlay);
+    }
+}
+
+// Notification
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: var(--success-color);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 4000;
+        animation: slideIn 0.3s ease-out;
+    `;
+    notification.innerHTML = `
+        <i class="fas fa-check-circle"></i> ${message}
+    `;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
 }
 
 // Generate PDF Invoice
@@ -439,15 +514,19 @@ function generateInvoice(order) {
     doc.setFont(undefined, 'bold');
     doc.text('Product', 25, yPos + 5);
     doc.text('Condition', 110, yPos + 5);
-    doc.text('Price', 160, yPos + 5, { align: 'right' });
+    doc.text('Price', 175, yPos + 5, { align: 'right' });
 
     yPos += 12;
     doc.setFont(undefined, 'normal');
     
     order.items.forEach(item => {
-        doc.text(item.name, 25, yPos);
+        if (yPos > 260) {
+            doc.addPage();
+            yPos = 20;
+        }
+        doc.text(item.name.length > 30 ? item.name.substring(0, 30) + '...' : item.name, 25, yPos);
         doc.text(item.condition, 110, yPos);
-        doc.text(`₹${item.price.toLocaleString()}`, 160, yPos, { align: 'right' });
+        doc.text(`₹${item.price.toLocaleString('en-IN')}`, 175, yPos, { align: 'right' });
         yPos += 8;
     });
 
@@ -457,17 +536,17 @@ function generateInvoice(order) {
     yPos += 8;
 
     doc.text('Subtotal:', 120, yPos);
-    doc.text(`₹${order.subtotal.toLocaleString()}`, 160, yPos, { align: 'right' });
+    doc.text(`₹${order.subtotal.toLocaleString('en-IN')}`, 175, yPos, { align: 'right' });
     yPos += 8;
 
     doc.text('Delivery:', 120, yPos);
-    doc.text('Free', 160, yPos, { align: 'right' });
+    doc.text('Free', 175, yPos, { align: 'right' });
     yPos += 8;
 
     doc.setFont(undefined, 'bold');
     doc.setFontSize(12);
     doc.text('Total:', 120, yPos);
-    doc.text(`₹${order.total.toLocaleString()}`, 160, yPos, { align: 'right' });
+    doc.text(`₹${order.total.toLocaleString('en-IN')}`, 175, yPos, { align: 'right' });
 
     // Footer
     yPos += 20;
@@ -475,8 +554,9 @@ function generateInvoice(order) {
     doc.setFont(undefined, 'normal');
     doc.setTextColor(100, 100, 100);
     doc.text('Thank you for shopping with Genuine Devices!', 105, yPos, { align: 'center' });
-    doc.text('For support: info@genuinedevices.com | +91 98765 43210', 105, yPos + 5, { align: 'center' });
-    doc.text('This is a computer-generated invoice', 105, yPos + 10, { align: 'center' });
+    doc.text('For support: info@genuinedevices.com | +91 82485 99468', 105, yPos + 5, { align: 'center' });
+    doc.text('Designed by Thosho Tech - https://thosho.github.io/', 105, yPos + 10, { align: 'center' });
+    doc.text('This is a computer-generated invoice', 105, yPos + 15, { align: 'center' });
 
     // Save PDF
     doc.save(`Invoice_${order.orderId}.pdf`);
@@ -490,9 +570,29 @@ function askQuestion(productId) {
     window.open(whatsappUrl, '_blank');
 }
 
-// Close overlay on click
-document.getElementById('overlay').addEventListener('click', () => {
-    toggleCart();
-    closeProductModal();
-    closeCheckoutModal();
-});
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
