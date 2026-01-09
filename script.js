@@ -486,7 +486,7 @@ function generateInvoice(order) {
 function askQuestion(productId) {
     const product = products.find(p => p.id === productId);
     const message = `Hi, I'm interested in the ${product.name}. Can you provide more details?`;
-    const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/918248599468?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 }
 
