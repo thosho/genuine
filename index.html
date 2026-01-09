@@ -16,13 +16,16 @@
                     <i class="fas fa-mobile-alt"></i>
                     <h1>Genuine Devices</h1>
                 </div>
-                <nav class="nav-menu">
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <nav class="nav-menu" id="navMenu">
                     <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#products">Products</a></li>
-                        <li><a href="#services">Services</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#home" onclick="closeMobileMenu()">Home</a></li>
+                        <li><a href="#products" onclick="closeMobileMenu()">Products</a></li>
+                        <li><a href="#services" onclick="closeMobileMenu()">Services</a></li>
+                        <li><a href="#about" onclick="closeMobileMenu()">About</a></li>
+                        <li><a href="#contact" onclick="closeMobileMenu()">Contact</a></li>
                     </ul>
                 </nav>
                 <div class="header-actions">
@@ -147,7 +150,7 @@
                 <div class="contact-info">
                     <div class="contact-item">
                         <i class="fas fa-phone"></i>
-                        <p>+91 8248599468</p>
+                        <p>+91 82485 99468</p>
                     </div>
                     <div class="contact-item">
                         <i class="fas fa-envelope"></i>
@@ -156,6 +159,10 @@
                     <div class="contact-item">
                         <i class="fas fa-map-marker-alt"></i>
                         <p>Bangalore, Karnataka, India</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fab fa-whatsapp"></i>
+                        <p>WhatsApp: +91 82485 99468</p>
                     </div>
                 </div>
                 <form class="contact-form" id="contactForm">
@@ -204,6 +211,7 @@
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2026 Genuine Devices. All rights reserved.</p>
+                <p class="designer-credit">Designed by <a href="https://thosho.github.io/" target="_blank" rel="noopener noreferrer">Thosho Tech</a></p>
             </div>
         </div>
     </footer>
@@ -230,8 +238,11 @@
 
     <!-- Product Modal -->
     <div class="modal" id="productModal">
+        <div class="modal-overlay" onclick="closeProductModal()"></div>
         <div class="modal-content">
-            <span class="close-modal" onclick="closeProductModal()">&times;</span>
+            <button class="close-modal" onclick="closeProductModal()">
+                <i class="fas fa-times"></i>
+            </button>
             <div class="modal-body" id="modalBody">
                 <!-- Product details will be loaded here -->
             </div>
@@ -240,70 +251,74 @@
 
     <!-- Checkout Modal -->
     <div class="modal" id="checkoutModal">
-        <div class="modal-content checkout-content">
-            <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
-            <h2>Checkout</h2>
-            <form id="checkoutForm">
-                <div class="form-section">
-                    <h3>Contact Information</h3>
-                    <input type="text" id="customerName" placeholder="Full Name" required>
-                    <input type="email" id="customerEmail" placeholder="Email" required>
-                    <input type="tel" id="customerPhone" placeholder="Phone Number" required pattern="[0-9]{10}">
+        <div class="modal-overlay" onclick="closeCheckoutModal()"></div>
+        <div class="modal-content modal-scrollable">
+            <button class="close-modal" onclick="closeCheckoutModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-body">
+                <div class="checkout-content">
+                    <h2>Checkout</h2>
+                    <form id="checkoutForm">
+                        <div class="form-section">
+                            <h3>Contact Information</h3>
+                            <input type="text" id="customerName" placeholder="Full Name" required>
+                            <input type="email" id="customerEmail" placeholder="Email" required>
+                            <input type="tel" id="customerPhone" placeholder="Phone Number (10 digits)" required pattern="[0-9]{10}" maxlength="10">
+                        </div>
+                        <div class="form-section">
+                            <h3>Delivery Address</h3>
+                            <input type="text" id="address" placeholder="Street Address" required>
+                            <div class="form-row">
+                                <input type="text" id="city" placeholder="City" required>
+                                <input type="text" id="state" placeholder="State" required>
+                            </div>
+                            <input type="text" id="pincode" placeholder="PIN Code (6 digits)" required pattern="[0-9]{6}" maxlength="6">
+                        </div>
+                        <div class="form-section">
+                            <h3>Payment Method</h3>
+                            <div class="payment-options">
+                                <label class="payment-option">
+                                    <input type="radio" name="payment" value="upi" checked>
+                                    <span><i class="fas fa-mobile-alt"></i> UPI</span>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="payment" value="card">
+                                    <span><i class="fas fa-credit-card"></i> Card</span>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="payment" value="netbanking">
+                                    <span><i class="fas fa-university"></i> Net Banking</span>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="payment" value="cod">
+                                    <span><i class="fas fa-money-bill-wave"></i> Cash on Delivery</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="order-summary">
+                            <h3>Order Summary</h3>
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="checkoutSubtotal">₹0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Delivery:</span>
+                                <span class="free-delivery">Free</span>
+                            </div>
+                            <div class="summary-row total-row">
+                                <span>Total:</span>
+                                <span id="checkoutTotal">₹0</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="place-order-btn">
+                            <i class="fas fa-check-circle"></i> Place Order
+                        </button>
+                    </form>
                 </div>
-                <div class="form-section">
-                    <h3>Delivery Address</h3>
-                    <input type="text" id="address" placeholder="Street Address" required>
-                    <div class="form-row">
-                        <input type="text" id="city" placeholder="City" required>
-                        <input type="text" id="state" placeholder="State" required>
-                    </div>
-                    <div class="form-row">
-                        <input type="text" id="pincode" placeholder="PIN Code" required pattern="[0-9]{6}">
-                    </div>
-                </div>
-                <div class="form-section">
-                    <h3>Payment Method</h3>
-                    <div class="payment-options">
-                        <label class="payment-option">
-                            <input type="radio" name="payment" value="upi" checked>
-                            <span><i class="fas fa-mobile-alt"></i> UPI</span>
-                        </label>
-                        <label class="payment-option">
-                            <input type="radio" name="payment" value="card">
-                            <span><i class="fas fa-credit-card"></i> Card</span>
-                        </label>
-                        <label class="payment-option">
-                            <input type="radio" name="payment" value="netbanking">
-                            <span><i class="fas fa-university"></i> Net Banking</span>
-                        </label>
-                        <label class="payment-option">
-                            <input type="radio" name="payment" value="cod">
-                            <span><i class="fas fa-money-bill-wave"></i> Cash on Delivery</span>
-                        </label>
-                    </div>
-                </div>
-                <div class="order-summary">
-                    <h3>Order Summary</h3>
-                    <div class="summary-row">
-                        <span>Subtotal:</span>
-                        <span id="checkoutSubtotal">₹0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Delivery:</span>
-                        <span>Free</span>
-                    </div>
-                    <div class="summary-row total-row">
-                        <span>Total:</span>
-                        <span id="checkoutTotal">₹0</span>
-                    </div>
-                </div>
-                <button type="submit" class="place-order-btn">Place Order</button>
-            </form>
+            </div>
         </div>
     </div>
-
-    <!-- Overlay -->
-    <div class="overlay" id="overlay"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
